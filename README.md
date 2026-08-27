@@ -10,7 +10,7 @@ spring-security
 
 #### B. Spring Security with properties file configuration:
    - Add the following properties in the application.properties file to configure session management:
-     ```application.properties
+     ``` application.properties
      server.servlet.session.timeout=10m
      spring.security.user.name=admin
      spring.security.user.password=admin123
@@ -18,4 +18,23 @@ spring-security
 #### C. Spring Security LOGOUT:
      - http://localhost:8080/logout
 
-
+### 2. Basic Authentication: 
+    - Check all steps in SecurityConfig.class.
+        Step-1: Create a SecurityConfig class.
+        Step-2: Override configure(HttpSecurity http) method.
+        Step-3: Giving permission /hello can be used by without authentication.
+    - POSTMAN testing:
+        - URL: http://localhost:8080/v1/api/hi
+        - Method: GET
+        - Authorization: Basic Auth
+            - Username: admin
+            - Password: admin123
+    - Basic64 decode command:
+        ```bash
+        echo -n 'admin:admin123' | base64
+        ```
+    - Basic64 encode command:
+        ```bash
+         echo "YWRtaW46YWRtaW4xMjM=" | base64 --decode
+        ```
+       
