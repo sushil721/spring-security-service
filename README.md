@@ -19,11 +19,11 @@ spring-security
      - http://localhost:8080/logout
 
 ### 2. Basic Authentication: 
-    - Check all steps in SecurityConfig.class.
-        Step-1: Create a SecurityConfig class.
-        Step-2: Override configure(HttpSecurity http) method.
-        Step-3: Giving permission /hello can be used by without authentication.
-    - POSTMAN testing:
+#### A. Check all steps in SecurityConfig.class with application.properties credential.
+        - Step-1: Create a SecurityConfig class.
+        - Step-2: Override configure(HttpSecurity http) method.
+        - Step-3: Giving permission /hello can be used by without authentication.
+#### B.  POSTMAN testing:
         - URL: http://localhost:8080/v1/api/hi
         - Method: GET
         - Authorization: Basic Auth
@@ -37,4 +37,57 @@ spring-security
         ```bash
          echo "YWRtaW46YWRtaW4xMjM=" | base64 --decode
         ```
-       
+#### C. DB (MySQL) based authentication:
+   - Step-1: Add JPA dependency and MySQL connector dependency in pom.xml file.
+   - Step-2: Add the following properties in the application.properties file to configure database connection:
+     ``` application.properties
+        spring.datasource.url=jdbc:mysql://localhost:3306/spring_security_db
+        spring.datasource.username=root
+        spring.datasource.password=root
+        spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+        spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
+        spring.jpa.hibernate.ddl-auto=update
+        spring.jpa.show-sql=true
+     ```
+     - Step-3: Create a database named `spring_security_db` in MySQL.
+     - Step-4: Create a table in the database to store user credentials.
+     - Step-5: Configure Spring Security to use JDBC authentication by providing the necessary database connection details in the application.properties file.
+     - Step-6: Implement a custom UserDetailsService to retrieve user details from the database.
+     - Step-7: Created UserEntity class to map the user table in the database.
+     - Step-8: Created UserRepository interface to perform findByUsernameAndIsActive operations.
+     - Step-9: Created UserService class to implement the business logic for user authentication.
+     - Step-10: Implements UserDetailsService in UserService class to override loadUserDetails from the database.
+     - Step-11: Load UserEntity data in UserDetails for Spring Security authentication.
+     - Step-12: Create bean of UserDetailsService bean in SecurityConfig class to use the custom UserDetailsService implementation for authentication.
+     - Step-13: Create AuthenticationManager bean in SecurityConfig class to use the custom UserDetailsService for authentication.
+     - Step-14: Instert user data in the database with username, password, and is_active fields.
+     `insert into spring_security_db.users(username, password, is_active) value ('sushil','sushil', 1);`
+     - Step-15: Test the API with POSTMAN using Basic Auth with username and password from the database.
+     - Step-16: Getting 401 Unauthorized error in POSTMAN testing. This error occurs when the provided credentials are invalid or the user is not active in the database. Ensure that the username and password are correct and that the user is marked as active in the database.
+     `Given that there is no default password encoder configured, each password must have a password encoding prefix. Please either prefix this password with '{noop}' or set a default password encoder in DelegatingPasswordEncoder.`
+     - Step-17: To resolve the 401 Unautherized error, We need to add a password encoder in the SecurityConfig class. This can be done by creating a bean of PasswordEncoder and using it to encode the passwords before storing them in the database. For example, we can use the BCryptPasswordEncoder as follows:
+       ```java
+       @Bean
+       public PasswordEncoder passwordEncoder() {
+           return new BCryptPasswordEncoder();
+       }
+       ```
+     - Step-18: Delete user entry from the table.
+     - Step-19: Create UserEntity with encoded password we need to encode the password before saving it to the database. For example, we can use the PasswordEncoder bean to encode the password as follows:
+       ```java
+       public void createUser() {
+        String encodedPassword = passwordEncoder.encode("sushil");
+        UserEntity user = new UserEntity();
+        user.setUsername("sushil");
+        user.setPassword(encodedPassword);
+        user.setIsActive(true);
+        userRepository.save(user);
+       }
+       ```
+     - Step-20: Create a UserController class and implement a REST API endpoint to create a new user. This endpoint should accept the username and password as input, encode the password using the PasswordEncoder bean, and save the user details in the database.
+     - Step-21: Exclude /encoded-user from security `.requestMatchers("/v1/api/user/**").permitAll()` .
+     - Step-22: Add user by the API with POSTMAN.
+     - Step-23: Test the API with POSTMAN using Basic Auth with username and password from the database.
+
+
+  
