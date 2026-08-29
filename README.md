@@ -16,24 +16,24 @@ spring-security
      spring.security.user.password=admin123
      ```
 #### C. Spring Security LOGOUT:
-     - http://localhost:8080/logout
+   - http://localhost:8080/logout
 
-### 2. Basic Authentication: 
+### 2. Basic (Session-Based) Authentication: 
 #### A. Check all steps in SecurityConfig.class with application.properties credential.
-        - Step-1: Create a SecurityConfig class.
-        - Step-2: Override configure(HttpSecurity http) method.
-        - Step-3: Giving permission /hello can be used by without authentication.
+   - Step-1: Create a SecurityConfig class.
+   - Step-2: Override configure(HttpSecurity http) method.
+   - Step-3: Giving permission /hello can be used by without authentication.
 #### B.  POSTMAN testing:
-        - URL: http://localhost:8080/v1/api/hi
-        - Method: GET
-        - Authorization: Basic Auth
-            - Username: admin
-            - Password: admin123
-    - Basic64 decode command:
+   - URL: http://localhost:8080/v1/api/hi
+   - Method: GET
+   - Authorization: Basic Auth
+       - Username: admin
+       - Password: admin123
+   - Basic64 decode command:
         ```bash
         echo -n 'admin:admin123' | base64
         ```
-    - Basic64 encode command:
+   - Basic64 encode command:
         ```bash
          echo "YWRtaW46YWRtaW4xMjM=" | base64 --decode
         ```
@@ -49,31 +49,31 @@ spring-security
         spring.jpa.hibernate.ddl-auto=update
         spring.jpa.show-sql=true
      ```
-     - Step-3: Create a database named `spring_security_db` in MySQL.
-     - Step-4: Create a table in the database to store user credentials.
-     - Step-5: Configure Spring Security to use JDBC authentication by providing the necessary database connection details in the application.properties file.
-     - Step-6: Implement a custom UserDetailsService to retrieve user details from the database.
-     - Step-7: Created UserEntity class to map the user table in the database.
-     - Step-8: Created UserRepository interface to perform findByUsernameAndIsActive operations.
-     - Step-9: Created UserService class to implement the business logic for user authentication.
-     - Step-10: Implements UserDetailsService in UserService class to override loadUserDetails from the database.
-     - Step-11: Load UserEntity data in UserDetails for Spring Security authentication.
-     - Step-12: Create bean of UserDetailsService bean in SecurityConfig class to use the custom UserDetailsService implementation for authentication.
-     - Step-13: Create AuthenticationManager bean in SecurityConfig class to use the custom UserDetailsService for authentication.
-     - Step-14: Instert user data in the database with username, password, and is_active fields.
+   - Step-3: Create a database named `spring_security_db` in MySQL.
+   - Step-4: Create a table in the database to store user credentials.
+   - Step-5: Configure Spring Security to use JDBC authentication by providing the necessary database connection details in the application.properties file.
+   - Step-6: Implement a custom UserDetailsService to retrieve user details from the database.
+   - Step-7: Created UserEntity class to map the user table in the database.
+   - Step-8: Created UserRepository interface to perform findByUsernameAndIsActive operations.
+   - Step-9: Created UserService class to implement the business logic for user authentication.
+   - Step-10: Implements UserDetailsService in UserService class to override loadUserDetails from the database.
+   - Step-11: Load UserEntity data in UserDetails for Spring Security authentication.
+   - Step-12: Create bean of UserDetailsService bean in SecurityConfig class to use the custom UserDetailsService implementation for authentication.
+   - Step-13: Create AuthenticationManager bean in SecurityConfig class to use the custom UserDetailsService for authentication.
+   - Step-14: Instert user data in the database with username, password, and is_active fields.
      `insert into spring_security_db.users(username, password, is_active) value ('sushil','sushil', 1);`
-     - Step-15: Test the API with POSTMAN using Basic Auth with username and password from the database.
-     - Step-16: Getting 401 Unauthorized error in POSTMAN testing. This error occurs when the provided credentials are invalid or the user is not active in the database. Ensure that the username and password are correct and that the user is marked as active in the database.
+   - Step-15: Test the API with POSTMAN using Basic Auth with username and password from the database.
+   - Step-16: Getting 401 Unauthorized error in POSTMAN testing. This error occurs when the provided credentials are invalid or the user is not active in the database. Ensure that the username and password are correct and that the user is marked as active in the database.
      `Given that there is no default password encoder configured, each password must have a password encoding prefix. Please either prefix this password with '{noop}' or set a default password encoder in DelegatingPasswordEncoder.`
-     - Step-17: To resolve the 401 Unautherized error, We need to add a password encoder in the SecurityConfig class. This can be done by creating a bean of PasswordEncoder and using it to encode the passwords before storing them in the database. For example, we can use the BCryptPasswordEncoder as follows:
+   - Step-17: To resolve the 401 Unautherized error, We need to add a password encoder in the SecurityConfig class. This can be done by creating a bean of PasswordEncoder and using it to encode the passwords before storing them in the database. For example, we can use the BCryptPasswordEncoder as follows:
        ```java
        @Bean
        public PasswordEncoder passwordEncoder() {
            return new BCryptPasswordEncoder();
        }
        ```
-     - Step-18: Delete user entry from the table.
-     - Step-19: Create UserEntity with encoded password we need to encode the password before saving it to the database. For example, we can use the PasswordEncoder bean to encode the password as follows:
+   - Step-18: Delete user entry from the table.
+   - Step-19: Create UserEntity with encoded password we need to encode the password before saving it to the database. For example, we can use the PasswordEncoder bean to encode the password as follows:
        ```java
        public void createUser() {
         String encodedPassword = passwordEncoder.encode("sushil");
@@ -84,10 +84,52 @@ spring-security
         userRepository.save(user);
        }
        ```
-     - Step-20: Create a UserController class and implement a REST API endpoint to create a new user. This endpoint should accept the username and password as input, encode the password using the PasswordEncoder bean, and save the user details in the database.
-     - Step-21: Exclude /encoded-user from security `.requestMatchers("/v1/api/user/**").permitAll()` .
-     - Step-22: Add user by the API with POSTMAN.
-     - Step-23: Test the API with POSTMAN using Basic Auth with username and password from the database.
+   - Step-20: Create a UserController class and implement a REST API endpoint to create a new user. This endpoint should accept the username and password as input, encode the password using the PasswordEncoder bean, and save the user details in the database.
+   - Step-21: Exclude /encoded-user from security `.requestMatchers("/v1/api/user/**").permitAll()` .
+   - Step-22: Add user by the API with POSTMAN.
+   - Step-23: Test the API with POSTMAN using Basic Auth with username and password from the database.
+
+### 3. JWT (Json Web Token) Authentication: 
+- JWT stands for JSON Web Token. It is a compact, URL-safe string used to securely transmit information between two parties, most commonly for authentication and authorization.
+#### A JWT has three parts separated by dots (.): xxxxx.yyyyy.zzzzz
+   - A. Header: Specifies the token type (JWT) and the signing algorithm (e.g., HS256, RS256).
+        ```json
+        {
+        "alg": "HS256",
+        "typ": "JWT"
+        }
+        ```
+   - B. Payload: Contains the data (called claims), such as:
+          ```json
+          {
+          "sub": "1234567890",
+          "name": "Alice",
+          "role": "admin",
+          "exp": 1756358400
+          }
+       ```
+   - C. Signature: Ensures the token hasn't been tampered with. Created by signing the header and payload with a secret key or private key.
+   - JWT steps to authentication and authorization.
+   - Step-1: User logs in with username and password.
+   - Step-2: Server verifies the credentials.
+   - Step-3: Server generates a JWT and sends it to the client.
+   - Step-4: Client stores the token (often in memory or a secure cookie).
+   - Step-5: For future requests, the client sends:
+    ```Authorization: Bearer eyJhbGciOiJIUzI1NiIs...```
+   - Step-6: The server verifies the token's signature and expiration.
+   - Step-7: If valid, the server processes the request.
+   - Step-8: Integration of JWT in our project and authenticate user.
+        - Step-a: Add all three JWT dependencies in pom.xml
+        - Step-b: Add ```.csrf(csrf -> csrf.disable())``` in SecurityConfig class.
+        - Step-c: Create UserEntity model class with username and password.
+        - Step-d: Create JwtService class and generateToken method with key.
+        - Step-e: Create ```/authenticate``` controller in UserController class.
+        - Step-f: Add ```.requestMatchers("/v1/api/users/authenticate").permitAll()``` in SecurityConfig clas.
+        - Step-g: Run Application and call ```/authenticate``` api with username and password body.
+        - Step-h: Call ```/hi``` API, with basic Auth its working because of basic authentication ``` .httpBasic(Customizer.withDefaults());``` in SecurityConfig class, but not with token because we only authenticated the user (generateToken).
+        - Step-g: For **Authorization** we need to validateToken. Going to next todo.
+
+
 
 
   

@@ -1,15 +1,20 @@
 package com.security.controller;
 
+import com.security.config.jwt.JwtService;
 import com.security.entity.UserEntity;
+import com.security.model.AuthRequest;
 import com.security.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(path = "/v1/api/users/")
+@RequestMapping(path = "/v1/api/users")
 public class UserController {
 
     @Autowired
@@ -17,7 +22,14 @@ public class UserController {
     @Autowired
     public PasswordEncoder passwordEncoder;
 
-    @GetMapping("encoded-user")
+    // This bean is created in SecurityConfig class.
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtService jwtService;
+
+    @GetMapping("/encoded-user")
     public ResponseEntity<UserEntity> createUser(@RequestParam("username") String username,
                                                  @RequestParam("password") String password){
         UserEntity userEntity = new UserEntity();
@@ -26,5 +38,19 @@ public class UserController {
         userEntity.setPassword(passwordEncoder.encode(password));
         userEntity.setActive(true);
         return new ResponseEntity<>(userService.createUser(userEntity), HttpStatus.OK);
+    }
+
+    @PostMapping("/authenticate")
+    public ResponseEntity<String> authenticate(@RequestBody AuthRequest authRequest){
+        Authentication authenticate = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(authRequest.getUsername(),
+                        authRequest.getPassword()));
+        if (authenticate.isAuthenticated()){
+            return ResponseEntity.ok(jwtService.generateToken(authRequest.getUsername()));
+        }/* else {
+            throw new RuntimeException("Authentication Failed");
+        }*/
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+
     }
 }
