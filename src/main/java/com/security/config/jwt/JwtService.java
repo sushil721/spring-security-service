@@ -36,6 +36,31 @@ public class JwtService {
         return Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
     }
 
+    public Claims verifySignatureAndExtractClaims(String token){
+        /*return Jwts.parser()
+                .setSigningKey(getSignedKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();*/
+        return Jwts.parser()
+                .verifyWith((SecretKey) getSignedKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
 
+    public String extractUserName(String token){
+        return verifySignatureAndExtractClaims(token)
+                .getSubject();
+    }
+
+    public Date getExpiration(String token){
+        return verifySignatureAndExtractClaims(token)
+                .getExpiration();
+    }
+
+    public boolean isTokenExpired(String token){
+        return getExpiration(token).before(new Date());
+    }
 
 }

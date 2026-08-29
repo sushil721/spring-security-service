@@ -1,6 +1,8 @@
 package com.security.config;
 
+import com.security.config.jwt.JwtFilter;
 import com.security.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,11 +16,15 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 //Using this class We can override form base authentication.
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    @Autowired
+    private JwtFilter jwtFilter;
 
     // Step-1: Using this we don't need to authenticate. it is bypassing authentication.
     /*@Bean
@@ -41,7 +47,10 @@ public class SecurityConfig {
                                .requestMatchers("/v1/api/users/encoded-user").permitAll()
                                .requestMatchers("/v1/api/users/authenticate").permitAll()
                                .anyRequest().authenticated())
-            .httpBasic(Customizer.withDefaults());
+            // this .httpBasic is for Basic Session based Authorization.
+            //.httpBasic(Customizer.withDefaults());
+            // this .addFilterAt is for JWT Authorization.
+              .addFilterAt(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

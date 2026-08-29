@@ -129,7 +129,21 @@ spring-security
         - Step-h: Call ```/hi``` API, with basic Auth its working because of basic authentication ``` .httpBasic(Customizer.withDefaults());``` in SecurityConfig class, but not with token because we only authenticated the user (generateToken).
         - Step-g: For **Authorization** we need to validateToken. Going to next todo.
 
-
+   - Step-8: Authorization: Authorize/Validate requests and check whether the token is expired or not.
+        - Step-a: Add verifySignatureAndExtractClaims method for extracting values from token in JwtService class.
+        - Step-b: Add extractUserName method for getting username from token in JwtService class.
+        - Step-c: Add getExpiration method for getting token is expiration time in JwtService class.
+        - Step-d: Add isTokenExpired method for check method is expired or live in JwtService class.
+        - Step-e: Create JwtFilter class with extends of OncePerRequestFilter.
+        - Step-f: Implements method doFilterInternal and set all details.
+        - Step-g: Remove ```.httpBasic(Customizer.withDefaults());``` from SecurityConfig.basicAuthentication method.
+        - Step-h: Add ```.addFilterAt(jwtFilter, UsernamePasswordAuthenticationFilter.class);``` at same line.
+        - Step-i: Run Application and create token by POSTMAN ```/authenticate```. copy token of response body.
+        - Step-j: Open ```/hi``` api and change Authorization from```Basic Auth``` to ```Bearer Auth```.
+        - Step-k: Paste copied token and hit api. Token Authorization is working... :)
+        - Problem/Dis-advantage: If we can delete user from table after creating token. so that token will working till end of expiration time.
+        - Solution-1: We can put our token expiration time less.
+        - Solution-2: Or we can put our all user details in REDIS cache and check after every authorization, and delete this user details from Redis at time of deleting user from DB.
 
 
   
