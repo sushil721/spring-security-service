@@ -10,6 +10,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -22,6 +23,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 //Using this class We can override form base authentication.
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     @Autowired
@@ -54,12 +56,13 @@ public class SecurityConfig {
                                .requestMatchers(HttpMethod.POST, "/v1/api/rooms/addRoom")
                                     .hasRole("ADMIN")
                                 //All room access only have Admin and Staff
-                               .requestMatchers(HttpMethod.GET, "/v1/api/rooms")
+                                .requestMatchers(HttpMethod.GET, "/v1/api/rooms")
                                     .hasAnyRole("ADMIN", "STAFF")
                                //a specific room (booked) can be  accessed by Admin, Staff, and Guest.
                                .requestMatchers(HttpMethod.GET, "/v1/api/rooms/**")
                                     .hasAnyRole("ADMIN", "STAFF", "GUEST")
                                 */
+                              /*
                               //Authorities based access
                                //authorize only admin can add room
                                .requestMatchers(HttpMethod.POST, "/v1/api/rooms/addRoom")
@@ -70,7 +73,7 @@ public class SecurityConfig {
                                //a specific room (booked) can be  accessed by Admin, Staff, and Guest.
                                .requestMatchers(HttpMethod.GET, "/v1/api/rooms/**")
                                  .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF", "ROLE_GUEST")
-
+                                */
                             .anyRequest().authenticated())
             // this .httpBasic is for Basic Session based Authorization.
             //.httpBasic(Customizer.withDefaults());

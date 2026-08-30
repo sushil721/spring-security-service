@@ -197,6 +197,27 @@ spring-security
        - Step-d: User with ROLE_STAFF authority access /rooms and /room/id
        - Step-e: User with ROLE_GUEST authority only can access their own room /room/id api.
        - Step-f: Hit Hi, Hey, and Hello apis. its working well for all roles. because we are not specified any role for them.
-      
-
-  
+   
+   - Step-11: Authorization: Authorise Role with @PreAuthorize 
+       - Step-a: Remove/comment below requestMapper code from SecurityConfig class.
+         ```java
+                 //Authorities based access
+                 //authorize only admin can add room
+                 .requestMatchers(HttpMethod.POST, "/v1/api/rooms/addRoom")
+                     .hasAuthority("ROLE_ADMIN")
+                 //All room access only have Admin and Staff
+                 .requestMatchers(HttpMethod.GET, "/v1/api/rooms")
+                     .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                 //a specific room (booked) can be  accessed by Admin, Staff, and Guest.
+                 .requestMatchers(HttpMethod.GET, "/v1/api/rooms/**")
+                     .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF", "ROLE_GUEST")
+           ```
+       - Step-b: Add ```@EnableMethodSecurity(prePostEnabled = true)``` annotation on top of SecurityConfig class.
+       - Step-c: Add ```@PreAuthorize("hasRole('ADMIN')")``` and ```@PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'GUEST')")``` on top of RoomController's methods according to requirement.
+       - Step-d: Run Application.
+       - Step-k: Hit call of APIs and perform role based authorization.
+       - Step-l: User with ADMIN role access all apis.
+       - Step-m: User with STAFF role access /rooms and /room/id
+       - Step-n: User with GUEST role only can access their own room /room/id api.
+       - Step-o: Hit Hi, Hey, and Hello apis. its working well for all roles. because we are not specified any role for them.
+     
