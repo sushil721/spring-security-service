@@ -2,6 +2,7 @@ package com.security.controller;
 
 import com.security.config.jwt.JwtService;
 import com.security.entity.UserEntity;
+import com.security.enums.Role;
 import com.security.model.AuthRequest;
 import com.security.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class UserController {
     @GetMapping("/encoded-user")
     public ResponseEntity<UserEntity> createUser(@RequestParam("username") String username,
                                                  @RequestParam("password") String password,
-                                                 @RequestParam("role") String role){
+                                                 @RequestParam("role") Role role){
         UserEntity userEntity = new UserEntity();
         userEntity.setUsername(username);
         //Encode password from text to encrypted formate using PasswordEncoder bean in SecurityConfig.java

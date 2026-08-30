@@ -234,4 +234,21 @@ spring-security
        - Step-j: User with GUEST role `aman`. not it will not going to become success because `aman` is not equals to `jyoti`.
        - Step-k: Hit Hi, Hey, and Hello apis. its working well for all roles. because we are not specified any role for them.
 
+   - Step-13: Authorization: using permissions (Authority)
+       - Step-a: Create Role ENUM and update it in UserEntity class.
+       - Step-b: Update UserService.loadUserByUserName by `.authorities(new SimpleGrantedAuthority(userEntity.getRole()))` to `.authorities(new SimpleGrantedAuthority(userEntity.getRole().name()))`.
+       - Step-c: Create Permission ENUM.
+       - Step-d: Add Permissions in Role enum.
+       - Step-e: Go to RoomController class.
+       - Step-f: Update ```@PreAuthorize("hasAuthority('ROOM_ADD')")``` instead of ```@PreAuthorize("hasRole('ADMIN')")```.
+       - Step-g: Update UserService.loadUserByUsername method with authorities.
+       - Step-h: Update JwtFilter.doFilterInternal method with Role and simpleGrantedAuthorities.
+       - Step-i: Update UserController.createUser parameter with String type to Role.
+       - Step-j: Comment ```@PostAuthorize("returnObject.assignedTo == authentication.name")``` in RoomController class for test all scenario.
+       - Step-k: Run Application.
+       - Step-l: Hit call of APIs and perform permission based authorization.
+       - Step-m: User with ADMIN permission access all apis.
+       - Step-n: User with STAFF permission access /rooms and /room/id
+       - Step-o: User with GUEST permission only can access their own room /room/id api.
+       - Step-p: Hit Hi, Hey, and Hello apis. its working well for all roles. because we are not specified any role for them.
 

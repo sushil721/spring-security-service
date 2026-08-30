@@ -1,5 +1,6 @@
 package com.security.entity;
 
+import com.security.enums.Role;
 import jakarta.persistence.*;
 
 @Entity
@@ -16,12 +17,13 @@ public class UserEntity {
     private Boolean isActive;
 
     @Column(name = "role")
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     public UserEntity() {
     }
 
-    public UserEntity(Long id, String username, String password, Boolean isActive, String role) {
+    public UserEntity(Long id, String username, String password, Boolean isActive, Role role) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -61,11 +63,11 @@ public class UserEntity {
         return isActive;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 

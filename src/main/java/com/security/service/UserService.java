@@ -11,7 +11,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -29,11 +31,22 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserEntity userEntity = getUserFromUsername(username);
+
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(userEntity.getRole().name()));
+
+        userEntity
+                .getRole()
+                .getPermissions()
+                .forEach(permission -> {
+                    authorities.add(new SimpleGrantedAuthority(permission.name()));
+                 });
+
         return User.builder()
                 .username(userEntity.getUsername())
                 .password(userEntity.getPassword())
                 //loading role in Spring security from DB.
-                .authorities(new SimpleGrantedAuthority(userEntity.getRole()))
+                .authorities(authorities)
                 .build();
     }
 

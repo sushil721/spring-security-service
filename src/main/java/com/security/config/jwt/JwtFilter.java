@@ -1,5 +1,6 @@
 package com.security.config.jwt;
 
+import com.security.enums.Role;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -35,9 +36,18 @@ public class JwtFilter extends OncePerRequestFilter {
         if(token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             Claims claims = jwtService.verifySignatureAndExtractClaims(token);
             //get Role from claim.
-            String role = claims.get("Role", String.class);
-            List<SimpleGrantedAuthority> simpleGrantedAuthorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
+            String roleString = claims.get("Role", String.class);
 
+            Role role = Role.valueOf("ROLE_"+roleString);
+
+            //List<SimpleGrantedAuthority> simpleGrantedAuthorities = List.of(new SimpleGrantedAuthority(role.name()));
+            List<SimpleGrantedAuthority> simpleGrantedAuthorities = new ArrayList<>(List.of(new SimpleGrantedAuthority(role.name())));
+            //add permissions
+            role
+                .getPermissions()
+                .forEach(permission ->{
+                    simpleGrantedAuthorities.add(new SimpleGrantedAuthority(permission.name()));
+            });
             if (!jwtService.isTokenExpired(token)) {
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken
                         = new UsernamePasswordAuthenticationToken(
