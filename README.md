@@ -176,6 +176,27 @@ spring-security
      - Step-l: User with ADMIN role access all apis.
      - Step-m: User with STAFF role access /rooms and /room/id
      - Step-n: User with GUEST role only can access their own room /room/id api.
+     - Step-o: Hit Hi, Hey, and Hello apis. its working well for all roles. because we are not specified any role for them.
      
+   - Step-10: Authorization: Authority and permissions.
+       - Step-a: Change all ```.hasRole()``` to ```.hasAuthority()``` and ADMIN, STAFF, GUEST to ROLE_ADMIN, ROLE_STAFF, ROLE_GUEST respectively in SecurityConfig class.
+         ```java
+                 //Authorities based access
+                 //authorize only admin can add room
+                 .requestMatchers(HttpMethod.POST, "/v1/api/rooms/addRoom")
+                     .hasAuthority("ROLE_ADMIN")
+                 //All room access only have Admin and Staff
+                 .requestMatchers(HttpMethod.GET, "/v1/api/rooms")
+                     .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                 //a specific room (booked) can be  accessed by Admin, Staff, and Guest.
+                 .requestMatchers(HttpMethod.GET, "/v1/api/rooms/**")
+                     .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF", "ROLE_GUEST")
+           ```
+       - Step-b: Hit call of APIs and perform authority based authorization.
+       - Step-c: User with ROLE_ADMIN authority access all apis.
+       - Step-d: User with ROLE_STAFF authority access /rooms and /room/id
+       - Step-e: User with ROLE_GUEST authority only can access their own room /room/id api.
+       - Step-f: Hit Hi, Hey, and Hello apis. its working well for all roles. because we are not specified any role for them.
+      
 
   

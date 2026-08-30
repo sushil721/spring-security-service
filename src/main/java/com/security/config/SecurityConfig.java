@@ -48,6 +48,7 @@ public class SecurityConfig {
                                .requestMatchers("/v1/api/users/encoded-user").permitAll()
                                .requestMatchers("/v1/api/users/authenticate").permitAll()
 
+                               /*
                                //Role based access
                                 //authorize only admin can add room
                                .requestMatchers(HttpMethod.POST, "/v1/api/rooms/addRoom")
@@ -58,6 +59,17 @@ public class SecurityConfig {
                                //a specific room (booked) can be  accessed by Admin, Staff, and Guest.
                                .requestMatchers(HttpMethod.GET, "/v1/api/rooms/**")
                                     .hasAnyRole("ADMIN", "STAFF", "GUEST")
+                                */
+                              //Authorities based access
+                               //authorize only admin can add room
+                               .requestMatchers(HttpMethod.POST, "/v1/api/rooms/addRoom")
+                                 .hasAuthority("ROLE_ADMIN")
+                               //All room access only have Admin and Staff
+                               .requestMatchers(HttpMethod.GET, "/v1/api/rooms")
+                                 .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                               //a specific room (booked) can be  accessed by Admin, Staff, and Guest.
+                               .requestMatchers(HttpMethod.GET, "/v1/api/rooms/**")
+                                 .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF", "ROLE_GUEST")
 
                             .anyRequest().authenticated())
             // this .httpBasic is for Basic Session based Authorization.
