@@ -20,13 +20,16 @@ public class JwtService {
     Logger LOGGER = LoggerFactory.getLogger(JwtService.class);
     public static final String SECRET = "MySuperSecretKey12345#098Sushil&Jyoti";
 
-    public String generateToken(String username){
+    public String generateToken(String username, String role){
         LOGGER.info("JwtService:: generateToken: Inside it.");
+        HashMap<String, Object> claims = new HashMap<>();
+        claims.put("Role", role);
+
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis()+1000*60))
-                .claims(new HashMap<>())
+                .claims(claims)
                 //.signWith(getSignedKey(), SignatureAlgorithm.HS256)
                 .signWith(getSignedKey())
                 .compact();

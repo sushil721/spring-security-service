@@ -146,4 +146,36 @@ spring-security
         - Solution-2: Or we can put our all user details in REDIS cache and check after every authorization, and delete this user details from Redis at time of deleting user from DB.
 
 
+   - Step-9: Authorization: Roles and permissions.
+        - Step-a: Add role properties in UserEntity class.
+        - Step-b: Replace ```.authorities(Collections.emptyList())``` to ```.authorities(new SimpleGrantedAuthority(userEntity.getRole()))``` for adding role in spring security UserDetails.
+        - Step-c: Add Role in claims of JwtService class at generateToken using HashMap.
+        - Step-d: In UserController ```/authenticate``` API, Get role from Spring Security authenticate object and add for use of generateToken method.
+        - Step-e: Get role from claim in JwtFilter and add as ```simpleGrantedAuthorities``` in place of ```new ArrayList<>()```.
+          ```java
+          String role = claims.get("Role", String.class);
+          List<SimpleGrantedAuthority> simpleGrantedAuthorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
+          ```
+        - Step-f: Add RoomController with 3 apis addRoom, getRoomById, and getRooms.
+        - Step-g: Perform role based authorization on it.
+   - Step-h: Add requestMatcher with different-different role in SecurityConfig class, like below,
+     ```java
+        //authorize only admin can add room
+        .requestMatchers(HttpMethod.POST, "/v1/api/rooms/addRoom")
+              .hasRole("ADMIN")
+        //All room access only have Admin and Staff
+        .requestMatchers(HttpMethod.GET, "/v1/api/rooms")
+              .hasAnyRole("ADMIN", "STAFF")
+        //a specific room (booked) can be  accessed by Admin, Staff, and Guest.
+        .requestMatchers(HttpMethod.GET, "/v1/api/rooms/**")
+               .hasAnyRole("ADMIN", "STAFF", "GUEST")
+     ```
+     - Step-i: Get role parameter from ```/encoded-user``` and set it in UserEntity object for save in DB.
+     - Step-j: Add 3 different users in db with role=ROLE_ADMIN, role=ROLE_STAFF, and role=ROLE_GUEST.
+     - Step-k: Hit call of APIs and perform role based authorization.
+     - Step-l: User with ADMIN role access all apis.
+     - Step-m: User with STAFF role access /rooms and /room/id
+     - Step-n: User with GUEST role only can access their own room /room/id api.
+     
+
   

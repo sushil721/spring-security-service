@@ -4,6 +4,7 @@ import com.security.entity.UserEntity;
 import com.security.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -31,7 +32,8 @@ public class UserService implements UserDetailsService {
         return User.builder()
                 .username(userEntity.getUsername())
                 .password(userEntity.getPassword())
-                .authorities(Collections.emptyList())
+                //loading role in Spring security from DB.
+                .authorities(new SimpleGrantedAuthority(userEntity.getRole()))
                 .build();
     }
 

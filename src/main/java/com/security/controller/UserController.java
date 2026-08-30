@@ -13,6 +13,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
+
 @RestController
 @RequestMapping(path = "/v1/api/users")
 public class UserController {
@@ -31,12 +33,15 @@ public class UserController {
 
     @GetMapping("/encoded-user")
     public ResponseEntity<UserEntity> createUser(@RequestParam("username") String username,
-                                                 @RequestParam("password") String password){
+                                                 @RequestParam("password") String password,
+                                                 @RequestParam("role") String role){
         UserEntity userEntity = new UserEntity();
         userEntity.setUsername(username);
         //Encode password from text to encrypted formate using PasswordEncoder bean in SecurityConfig.java
         userEntity.setPassword(passwordEncoder.encode(password));
         userEntity.setActive(true);
+        userEntity.setRole(role);
+
         return new ResponseEntity<>(userService.createUser(userEntity), HttpStatus.OK);
     }
 
@@ -46,7 +51,15 @@ public class UserController {
                 new UsernamePasswordAuthenticationToken(authRequest.getUsername(),
                         authRequest.getPassword()));
         if (authenticate.isAuthenticated()){
-            return ResponseEntity.ok(jwtService.generateToken(authRequest.getUsername()));
+            // get role from Spring Security.
+            String role = Objects.requireNonNull(authenticate
+                            .getAuthorities()
+                            .iterator()
+                            .next()
+                            .getAuthority())
+                    .replace("ROLE_", "");
+
+            return ResponseEntity.ok(jwtService.generateToken(authRequest.getUsername(), role));
         }/* else {
             throw new RuntimeException("Authentication Failed");
         }*/
