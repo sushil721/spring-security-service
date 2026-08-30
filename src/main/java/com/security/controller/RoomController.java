@@ -1,5 +1,7 @@
 package com.security.controller;
 
+import com.security.model.Room;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,8 +17,9 @@ public class RoomController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'GUEST')")
-    public String getRoomById(@PathVariable Long id){
-        return "Room fetched for id: "+id;
+    @PostAuthorize("returnObject.assignedTo == authentication.name")
+    public Room getRoomById(@PathVariable Long id){
+        return new Room(id, "jyoti");
     }
 
     @GetMapping

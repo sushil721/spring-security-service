@@ -215,9 +215,23 @@ spring-security
        - Step-b: Add ```@EnableMethodSecurity(prePostEnabled = true)``` annotation on top of SecurityConfig class.
        - Step-c: Add ```@PreAuthorize("hasRole('ADMIN')")``` and ```@PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'GUEST')")``` on top of RoomController's methods according to requirement.
        - Step-d: Run Application.
-       - Step-k: Hit call of APIs and perform role based authorization.
-       - Step-l: User with ADMIN role access all apis.
-       - Step-m: User with STAFF role access /rooms and /room/id
-       - Step-n: User with GUEST role only can access their own room /room/id api.
-       - Step-o: Hit Hi, Hey, and Hello apis. its working well for all roles. because we are not specified any role for them.
-     
+       - Step-e: Hit call of APIs and perform role based authorization.
+       - Step-f: User with ADMIN role access all apis.
+       - Step-g: User with STAFF role access /rooms and /room/id
+       - Step-h: User with GUEST role only can access their own room /room/id api.
+       - Step-i: Hit Hi, Hey, and Hello apis. its working well for all roles. because we are not specified any role for them.
+
+   - Step-12: Authorization: Authorise Role with @PostAuthorize 
+       - Step-a: Add Room class with id, and assignedTo properties in class and make Room object as return type of getRoomById method.
+       - Step-b: Add ```@PostAuthorize("returnObject.assignedTo == authentication.name")``` annotation on top of getRoomById method.
+       - Step-c: return new Room(id, "jyoti");
+       - Step-d: So if response of ```returnObject.assignedTo``` is `jyoti` and ```authentication.name``` is also `jyoti`. So it will Authenticate successfully and return response with 200 status.
+       - Step-e: else if ```authentication.name``` is other than `jyoti`, it will return 403 forbidden.
+       - Step-f: Run Application.
+       - Step-g: Hit call of APIs and perform role based authorization.
+       - Step-h: User with ADMIN role `jyoti` access all apis.
+       - Step-i: User with STAFF role `sushil` access /room/id, it will return 403 forbidden. because ```@PostAuthorize("returnObject.assignedTo == authentication.name")``` will false.
+       - Step-j: User with GUEST role `aman`. not it will not going to become success because `aman` is not equals to `jyoti`.
+       - Step-k: Hit Hi, Hey, and Hello apis. its working well for all roles. because we are not specified any role for them.
+
+
