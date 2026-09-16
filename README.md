@@ -299,15 +299,69 @@
 
 - E. OAuth 2.0 with Spring Security:
    - Spring Security provides built-in support for OAuth 2.0, allowing developers to easily integrate OAuth 2.0 authentication and authorization into their applications. It offers features such as client registration, token management, and support for various OAuth 2.0 flows, making it easier to implement secure access to protected resources.
-   - Step-1: To configure OAuth 2.0 in a Spring Boot application, you can use the `spring-security-oauth2-client` and `spring-security-oauth2-resource-server` dependencies. You can define client registration properties in the `application.properties` or `application.yml` file, specifying details such as client ID, client secret, authorization URI, token URI, and scopes. Spring Security will handle the OAuth 2.0 flow, including redirecting users to the authorization server, exchanging authorization codes for access tokens, and validating tokens for resource access.
-   - Step-2: Example configuration in `application.properties`:
-     ```properties
-     spring.security.oauth2.client.registration.my-client.client-id=your-client-id
-     spring.security.oauth2.client.registration.my-client.client-secret=your-client-secret
-     spring.security.oauth2.client.registration.my-client.authorization-grant-type=authorization_code
-     spring.security.oauth2.client.registration.my-client.redirect-uri={baseUrl}/login/oauth2/code/{registrationId}
-     spring.security.oauth2.client.registration.my-client.scope=read,write
-     spring.security.oauth2.client.provider.my-provider.authorization-uri=https://authorization-server.com/oauth/authorize
-     spring.security.oauth2.client.provider.my-provider.token-uri=https://authorization-server.com/oauth/token
-     spring.security.oauth2.client.provider.my-provider.user-info-uri=https://authorization-server.com/userinfo
+   - Step-1: Create spring-security-oAuth-client-service project with Spring Boot and add the necessary dependencies for Spring Security and OAuth 2.0 support in the `pom.xml` file. The required dependencies include `spring-boot-starter-security`, `spring-security-oauth2-client`, and `spring-security-oauth2-resource-server`. These dependencies provide the necessary components to implement OAuth 2.0 authentication and authorization in a Spring Boot application.
+   - Step-2: To configure OAuth 2.0 in a Spring Boot application, you can use the `spring-boot-starter-security-oauth2-client` and `spring-boot-starter-security` dependencies. You can define client registration properties in the `application.properties` or `application.yml` file, specifying details such as client ID, client secret, authorization URI, token URI, and scopes. Spring Security will handle the OAuth 2.0 flow, including redirecting users to the authorization server, exchanging authorization codes for access tokens, and validating tokens for resource access.
+   - Step-3: Example configuration in `application.yaml`:
+     ```yaml
+     spring:
+       security:
+         oauth2:
+           client:
+             registration:
+               google:
+                 client-id: your-client-id
+                 client-secret: your-client-secret
+                 scope: 
+                  - profile
+                  - email
+                 redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+             provider:
+               google:
+                 authorization-uri: https://accounts.google.com/o/oauth2/auth
+                 token-uri: https://oauth2.googleapis.com/token
+                 user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+                 user-name-attribute: sub
      ```
+   - Step-4: Go to Google Cloud Console [https://console.cloud.google.com/]  and create a new project. Enable the "Google+ API" for the project. Create OAuth 2.0 credentials (Client ID and Client Secret) for a web application. Set the authorized redirect URI to `http://localhost:8080/login/oauth2/code/google`. Copy the generated Client ID and Client Secret and update them in the `application.yaml` file.
+   - Step-5: Got to 'Select a project' and 'Create a project' with name `sushil9040` -> `create`.
+   - Step-6: Go to 'Select a project' and 'sushil9040'.
+   - Step-7: Got to Left side menu and click on 'APIs & Services' -> 'Credentials' -> 'Create credentials' -> 'OAuth Client ID'.
+   - Step-8: Click on 'Configure consent screen' and select 'Get Started'.
+   - Step-9: 
+       - App name: spring-oAuth-2
+       - User support mail: <email-id>
+       - next -> Audiance: 'External' -> next -> Contact Information : <email-id> -> Check -> Continue -> Create.
+   - Step-10: Click on 'Create OAuth client'
+       - Application type: Web application
+       - Name: spring-oAuth-application
+       - Authorized redirect URIs (+ Add URI): http://localhost:8081/login/oauth2/code/google
+       - Click on 'Create' and copy the generated Client ID and Client Secret and copy it and download json file.
+   - Step-11: Go to the `Data Access` tab -> 'Add or remove scopes' -> 'Add scope' -> Select '/auth/userinfo.email' and '/auth/userinfo.profile' -> 'Update' -> 'Save'.
+   - Step-12: Add ${CLIENT_ID} and ${CLIENT_SECRET} in run environment with copied values. like, 
+       - `CLIENT_ID=123-abcde.apps.googleusercontent.com;CLIENT_SECRET=ABCDEFGHIJKLMNOPQRSTUVWXYZ`
+   - Step-13: Run the application and open the browser and go to `http://localhost:8081/` login it and logout by /logout url. 
+   - Step-14: Add 'SecurityConfig' class and add below code in it.
+     ```java
+     @Configuration
+     @EnableWebSecurity
+     public class SecurityConfig {
+         @Bean
+         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+             http
+                 .authorizeHttpRequests(auth -> auth
+                     //.requestMatchers("/").permitAll()
+                     .anyRequest().authenticated()
+                 )
+                 .oauth2Login(Customizer.withDefaults());
+             return http.build();
+         }
+     }
+     ```
+   - Step-15: Add 'HomeController' class and add below code in it.
+   - Step-16: Run the application and open the browser and go to `http://localhost:8081/hello` .
+   - Step-17: It will redirect to Google login page, login with your Google account, and it will redirect to `http://localhost:8081/hello` and display the message "Hello World !!".
+   - Step-18: check 'http://localhost:8081/hi' and 'http://localhost:8081/hey' urls. and it will give response message without login because it already logged-in.
+   - Step-19: Logout by 'http://localhost:8081/logout' and check 'http://localhost:8081/me' url. It will redirect to Google login page because we logged out.
+   - Step-20: It is giving details of logged-in user with email, name, and picture. It is working well.
+   - Step-21: Same operation check with 'http://localhost:8081/my' url. It is working well.
+     

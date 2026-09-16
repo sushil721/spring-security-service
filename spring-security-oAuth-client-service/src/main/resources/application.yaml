@@ -1,0 +1,33 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: spring-security-oAuth-client-service
+  security:
+    oauth2:
+        client:
+            # OAuth2 Client Registration
+            registration:
+              google:
+                client-id: ${CLIENT_ID}
+                client-secret: ${CLIENT_SECRET}
+                authorization-grant-type: authorization_code
+                scope:
+                  - profile
+                  - email
+                redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+                client-name: Google
+
+            # OAuth2  Client Configuration
+            provider:
+              google:
+                # Authorization API
+                authorization-uri: https://accounts.google.com/o/oauth2/auth
+                # Access Token API
+                token-uri: https://oauth2.googleapis.com/token
+                # User Info API
+                user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+                user-name-attribute: sub
+
+
