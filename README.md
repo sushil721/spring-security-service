@@ -252,3 +252,57 @@ spring-security
        - Step-o: User with GUEST permission only can access their own room /room/id api.
        - Step-p: Hit Hi, Hey, and Hello apis. its working well for all roles. because we are not specified any role for them.
 
+### 5. OAuth 2.0 :  
+-  OAuth 2.0 is an authorization framework that lets applications request limited access to a user’s resources without exposing credentials. The payloads exchanged in its flows contain critical parameters like client_id, scope, state, code, and tokens (access/refresh), which define what data can be accessed, for how long, and under what conditions.
+-  OAuth 2.0 is about authorization (what an app can do), not authentication (who the user is). For identity, OpenID Connect (OIDC) extends OAuth 2.0 with ID tokens.
+-  OAuth 2.0 defines four main roles:
+   - Resource Owner: The user who authorizes an application to access their data.
+   - Client: The application requesting access to the user's resources.
+   - Authorization Server: Issues access tokens to the client after authenticating the resource owner and obtaining authorization.
+   - Resource Server: Hosts the protected resources and validates access tokens to allow or deny access.
+
+- A. Payload of OAuth 2.0:
+   - The payloads exchanged in OAuth 2.0 flows contain critical parameters that define the authorization process. These parameters include:
+     - client_id: Identifies the client application making the request.
+     - scope: Specifies the level of access requested by the client.
+     - state: A unique string to maintain state between the request and callback, preventing CSRF attacks.
+     - code: An authorization code issued by the authorization server to the client.
+     - tokens (access/refresh): Access tokens grant temporary access to resources, while refresh tokens allow obtaining new access tokens without re-authentication.
+     - redirect_uri: The URI to which the authorization server will send the user after granting or denying access.
+     - grant_type: Specifies the type of authorization grant being used (e.g., authorization_code, client_credentials, password, refresh_token).
+
+- B. Consent Screen:   
+   - The consent screen is a user interface presented by the authorization server during the OAuth 2.0 authorization process. It informs the resource owner (user) about the client application requesting access to their resources and the specific permissions being requested. The consent screen allows users to make informed decisions about granting or denying access, ensuring transparency and control over their data.
+
+- C. OAuth 2.0 Flows:
+   - OAuth 2.0 defines several authorization flows to accommodate different types of clients and use cases. The most common flows include:
+     - Authorization Code Flow: Used by web and mobile applications, where the client receives an authorization code that is exchanged for an access token.
+     - Implicit Flow: Designed for single-page applications (SPAs) where the access token is returned directly in the URL fragment.
+     - Resource Owner Password Credentials Flow: Allows clients to obtain an access token by directly providing the resource owner's username and password (not recommended for public clients).
+     - Client Credentials Flow: Used for server-to-server communication, where the client authenticates itself using its own credentials to obtain an access token.
+     - Refresh Token Flow: Allows clients to obtain a new access token using a refresh token without requiring the resource owner to re-authenticate.
+     - Device Authorization Flow: Designed for devices with limited input capabilities, where the user authorizes the device on a separate device with a browser.
+     - JWT Bearer Token Flow: Allows clients to obtain an access token by presenting a JWT signed by the client, which is validated by the authorization server.
+     - SAML 2.0 Bearer Assertion Flow: Enables clients to obtain an access token by presenting a SAML 2.0 assertion, which is validated by the authorization server.
+     - Token Exchange Flow: Allows clients to exchange one type of token for another, enabling scenarios like delegation and token transformation.
+     - Device Code Flow: Similar to the Device Authorization Flow, but designed for devices that cannot display a user interface, allowing users to authorize the device on a separate device with a browser.
+     - Refresh Token Rotation Flow: Enhances security by rotating refresh tokens, ensuring that each refresh token can only be used once, reducing the risk of token theft and replay attacks.
+
+- D. OAuth 2.0 Flow Diagram:
+   ![img.png](img.png)
+   ![img_1.png](img_1.png)
+
+- E. OAuth 2.0 with Spring Security:
+   - Spring Security provides built-in support for OAuth 2.0, allowing developers to easily integrate OAuth 2.0 authentication and authorization into their applications. It offers features such as client registration, token management, and support for various OAuth 2.0 flows, making it easier to implement secure access to protected resources.
+   - Step-1: To configure OAuth 2.0 in a Spring Boot application, you can use the `spring-security-oauth2-client` and `spring-security-oauth2-resource-server` dependencies. You can define client registration properties in the `application.properties` or `application.yml` file, specifying details such as client ID, client secret, authorization URI, token URI, and scopes. Spring Security will handle the OAuth 2.0 flow, including redirecting users to the authorization server, exchanging authorization codes for access tokens, and validating tokens for resource access.
+   - Step-2: Example configuration in `application.properties`:
+     ```properties
+     spring.security.oauth2.client.registration.my-client.client-id=your-client-id
+     spring.security.oauth2.client.registration.my-client.client-secret=your-client-secret
+     spring.security.oauth2.client.registration.my-client.authorization-grant-type=authorization_code
+     spring.security.oauth2.client.registration.my-client.redirect-uri={baseUrl}/login/oauth2/code/{registrationId}
+     spring.security.oauth2.client.registration.my-client.scope=read,write
+     spring.security.oauth2.client.provider.my-provider.authorization-uri=https://authorization-server.com/oauth/authorize
+     spring.security.oauth2.client.provider.my-provider.token-uri=https://authorization-server.com/oauth/token
+     spring.security.oauth2.client.provider.my-provider.user-info-uri=https://authorization-server.com/userinfo
+     ```
