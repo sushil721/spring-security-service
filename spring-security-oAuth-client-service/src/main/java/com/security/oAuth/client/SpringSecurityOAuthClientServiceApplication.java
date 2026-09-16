@@ -1,13 +1,13 @@
-package com.security;
+package com.security.oAuth.client;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SpringSecurityServiceApplication {
+public class SpringSecurityOAuthClientServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SpringSecurityServiceApplication.class, args);
+		SpringApplication.run(SpringSecurityOAuthClientServiceApplication.class, args);
 	}
 
 }

@@ -1,5 +1,7 @@
 # spring-security
-spring-security
+
+## spring-security-session-basic-jwt-service:
+- Here we are going to learn about spring security with session, basic, and JWT authentication and authorization.
 
 ### 1. Form and Session Based Authentication: 
 #### A. Default Spring Security configuration:
@@ -251,6 +253,9 @@ spring-security
        - Step-n: User with STAFF permission access /rooms and /room/id
        - Step-o: User with GUEST permission only can access their own room /room/id api.
        - Step-p: Hit Hi, Hey, and Hello apis. its working well for all roles. because we are not specified any role for them.
+
+## spring-security-oAuth-client-service:
+- here we are going to learn about spring security with OAuth 2.0 client service.
 
 ### 5. OAuth 2.0 :  
 -  OAuth 2.0 is an authorization framework that lets applications request limited access to a user’s resources without exposing credentials. The payloads exchanged in its flows contain critical parameters like client_id, scope, state, code, and tokens (access/refresh), which define what data can be accessed, for how long, and under what conditions.
